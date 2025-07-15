@@ -6,7 +6,7 @@ const itemSchema = new mongoose.Schema(
     name: { type: String, required: true },
     origin: { type: String, required: true },
     status: { type: String, required: true },
-    mass: { type: Number, required: true },
+    mass: { type: String, required: true },
     unit: {type: String, required: true},
     price: { type: Number, required: true },
     description: { type: String },
