@@ -16,6 +16,7 @@ router.post("/add-item", async (req, res) => {
       description,
       category,
       location,
+      currency,
       images,
     } = req.body;
 
@@ -30,6 +31,7 @@ router.post("/add-item", async (req, res) => {
       description,
       category,
       location,
+      currency,
       images,
     });
 
