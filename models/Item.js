@@ -12,7 +12,7 @@ const itemSchema = new mongoose.Schema(
     description: { type: String },
     category: { type: String },
     location: { type: String },
-
+    currency: {type: String},
     // Store images as base64
      images: [String],
   },
