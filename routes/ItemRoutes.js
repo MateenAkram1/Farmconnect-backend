@@ -37,7 +37,7 @@ router.post("/add-item", async (req, res) => {
     res.status(201).json({ message: "Item added successfully", id: newItem._id });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "Failed to add item" });
+    res.status(500).json({ message: err.message });
   }
 });
 
