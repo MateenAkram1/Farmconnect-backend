@@ -78,51 +78,63 @@ router.delete('/:userId/:itemId', async (req, res) => {
 router.post('/checkout/:buyerId', async (req, res) => {
   const buyerId = req.params.buyerId;
   const {
+    selectedItems,       // Array of itemIds
     buyerName,
     buyerEmail,
     buyerAddress,
     buyerPhone,
     paymentMethod,
-    deliveryFee = 0
+    deliveryFee = 0,
   } = req.body;
 
-  try {
-    // 1. Load and populate cart
-    const cart = await Cart.findOne({ userId: buyerId }).populate('items.itemId');
-    if (!cart || cart.items.length === 0) {
-      return res.status(400).json({ message: 'Cart is empty' });
-    }
+  if (!Array.isArray(selectedItems) || selectedItems.length === 0) {
+    return res.status(400).json({ message: 'No items selected for checkout' });
+  }
 
-    const createdOrders = [];
+  try {
+    // 1. Load full cart with item data
+    const cart = await Cart.findOne({ userId: buyerId }).populate('items.itemId');
+    if (!cart) return res.status(404).json({ message: 'Cart not found' });
+
+    const selectedCartItems = cart.items.filter(cartItem =>
+      selectedItems.includes(cartItem.itemId._id.toString())
+    );
+
+    if (selectedCartItems.length === 0) {
+      return res.status(400).json({ message: 'Selected items not found in cart' });
+    }
 
     // 2. Group by vendor
     const byVendor = {};
-    for (const cartItem of cart.items) {
+    for (const cartItem of selectedCartItems) {
       const item = cartItem.itemId;
-      const vendor = item.userId;
+      const vendor = item.userId.toString();
+
       if (!byVendor[vendor]) byVendor[vendor] = [];
-      const lineTotal = item.price * cartItem.quantity;
+
       byVendor[vendor].push({
-        itemId:       item._id,
-        itemName:     item.name,
-        quantity:     cartItem.quantity,
+        itemId: item._id,
+        itemName: item.name,
+        quantity: cartItem.quantity,
         pricePerUnit: item.price,
-        total:        lineTotal,
+        total: item.price * cartItem.quantity,
       });
     }
 
-    // 3. Create one Order per vendor
+    // 3. Create Orders per vendor
+    const createdOrders = [];
+
     for (const [vendorId, items] of Object.entries(byVendor)) {
       const subtotal = items.reduce((sum, i) => sum + i.total, 0);
-      const total    = subtotal + deliveryFee;
+      const total = subtotal + deliveryFee;
 
       const order = await Order.create({
         buyer: {
-          id:      buyerId,
-          name:    buyerName,
-          email:   buyerEmail,
+          id: buyerId,
+          name: buyerName,
+          email: buyerEmail,
           address: buyerAddress,
-          phone:   buyerPhone,
+          phone: buyerPhone,
         },
         vendorId,
         items,
@@ -137,12 +149,14 @@ router.post('/checkout/:buyerId', async (req, res) => {
       createdOrders.push(order);
     }
 
-    // 4. Clear cart
-    cart.items = [];
+    // 4. Remove only selected items from cart
+    cart.items = cart.items.filter(
+      item => !selectedItems.includes(item.itemId._id.toString())
+    );
     await cart.save();
 
     res.status(201).json({
-      message: 'Checkout successful, orders created',
+      message: 'Checkout successful',
       orders: createdOrders,
     });
 
@@ -151,6 +165,7 @@ router.post('/checkout/:buyerId', async (req, res) => {
     res.status(500).json({ error: 'Checkout failed' });
   }
 });
+
 
 
 export default router;
