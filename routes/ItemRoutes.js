@@ -62,7 +62,7 @@ router.get('/get-item/:itemId', async (req, res) => {
     if (!item) {
       return res.status(404).json({ error: 'Item not found' });
     }
-    res.status(200).json(item);
+    res.json(item);
   } catch (error) {
     console.error('Error fetching item:', error);
     res.status(500).json({ error: 'Server error' });
