@@ -12,6 +12,7 @@ const NotificationSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  buyerflag: Boolean,
   createdAt: {
     type: Date,
     default: Date.now,
