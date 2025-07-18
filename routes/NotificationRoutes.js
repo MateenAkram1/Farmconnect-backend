@@ -42,10 +42,10 @@ router.get('/user/:userId', async (req, res) => {
 
 // Clear all notifications for a user
 router.delete('/clear/:userId/:buyerFlag', async (req, res) => {
-  const { userId, buyerFlag } = req.params;
+  const { userId, buyerflag } = req.params;
 
   try {
-    await Notification.deleteMany({ userId, buyerflag: buyerFlag });
+    await Notification.deleteMany({ userId, buyerflag });
 
     res.status(200).json({ success: true, message: 'Notifications cleared' });
   } catch (err) {
@@ -54,9 +54,9 @@ router.delete('/clear/:userId/:buyerFlag', async (req, res) => {
   }
 });
 
-router.patch('/read-all/:userId/:buyerflag', async (req, res) => {
+router.patch('/read-all/:userId/:buyerFlag', async (req, res) => {
   try {
-    await Notification.updateMany({ userId: req.params.userId, buyerflag: req.params.buyerflag }, { markAsRead: true });
+    await Notification.updateMany({ userId: req.params.userId, buyerflag: req.params.buyerFlag }, { markAsRead: true });
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ success: false });
