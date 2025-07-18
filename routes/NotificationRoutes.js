@@ -53,8 +53,15 @@ router.delete('/clear/:userId', async (req, res) => {
     res.status(500).json({ success: false, message: 'Server error' });
   }
 });
+router.patch('/read-all/:userId', async (req, res) => {
+  try {
+    await Notification.updateMany({ userId: req.params.userId }, { markAsRead: true });
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ success: false });
+  }
+});
 
-// routes/notifications.js
 router.patch('/read/:notificationId', async (req, res) => {
   const { notificationId } = req.params;
 
