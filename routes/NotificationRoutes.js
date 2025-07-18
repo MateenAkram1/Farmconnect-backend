@@ -5,8 +5,7 @@ const router = express.Router();
 
 // Send a notification
 router.post('/send', async (req, res) => {
-    console.log("HEllooo")
-  const { userId, title, message } = req.body;
+  const { userId, title, message, buyerflag } = req.body;
 
   if (!userId || !title || !message) {
     return res.status(400).json({ success: false, message: 'Missing fields' });
@@ -17,6 +16,7 @@ router.post('/send', async (req, res) => {
       userId,
       title,
       message,
+      buyerflag
     });
 
     res.status(201).json({ success: true, notification });
