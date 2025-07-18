@@ -55,18 +55,7 @@ router.get("/user/:userId", async (req, res) => {
   }
 });
 
-// GET /api/items/:itemId - Fetch item by ID
-router.get('/:itemId', async (req, res) => {
-  try {
-    const item = await Item.findById(req.params.itemId);
-    if (!item) {
-      return res.status(404).json({ error: 'Item not found' });
-    }
-    res.json(item);
-  } catch (error) {
-    res.status(500).json({ error: 'Server error' });
-  }
-});
+
 
 // GET /api/items/latest - Fetch latest 20 items
 router.get('/latest', async (req, res) => {
