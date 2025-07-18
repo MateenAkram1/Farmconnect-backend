@@ -42,10 +42,8 @@ router.get('/user/:userId', async (req, res) => {
 
 // Clear all notifications for a user
 router.delete('/clear/:userId/:buyerFlag', async (req, res) => {
-  const { userId, buyerFlag } = req.params;
-
   try {
-    await Notification.deleteMany({ userId, buyerflag: buyerFlag });
+    await Notification.deleteMany({ userId: req.params.userId, buyerflag: req.params.buyerFlag });
 
     res.status(200).json({ success: true, message: 'Notifications cleared' });
   } catch (err) {
