@@ -81,6 +81,31 @@ router.get('/latest', async (req, res) => {
   }
 });
 
+router.post("/search-item/:userId", async (req, res) => {
+  const { userId } = req.params;
+  const { query } = req.body;
+
+  try {
+    if (!userId) {
+      return res.status(400).json({ success: false, message: "Missing userId" });
+    }
+
+    const searchFilter = query
+      ? {
+          userId,
+          name: { $regex: query, $options: "i" },
+        }
+      : { userId };
+
+    const results = await Item.find(searchFilter);
+
+    res.status(200).json({ success: true, results });
+  } catch (err) {
+    console.error("Error in search-item:", err);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
 router.get('/search/:userId', async (req, res) => {
   const { userId } = req.params;
   const { search } = req.query;
