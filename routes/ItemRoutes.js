@@ -81,6 +81,24 @@ router.get('/latest', async (req, res) => {
   }
 });
 
+router.get('/search/:userId', async (req, res) => {
+  const { userId } = req.params;
+  const { search } = req.query;
+
+  try {
+    const filter = { userId };
+    if (search) {
+      filter.name = { $regex: search, $options: 'i' }; 
+    }
+
+    const items = await Item.find(filter).sort({ createdAt: -1 });
+    res.json({ success: true, items });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
 // PUT /api/items/:id - Update item partially
 router.put('/edit-item/:id', async (req, res) => {
   const { id } = req.params;
