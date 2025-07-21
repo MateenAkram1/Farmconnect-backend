@@ -82,20 +82,12 @@ router.get('/latest', async (req, res) => {
 });
 
 router.post("/search-item/:userId", async (req, res) => {
-  const { userId } = req.params;
   const { query } = req.body;
 
   try {
-    if (!userId) {
-      return res.status(400).json({ success: false, message: "Missing userId" });
-    }
-
     const searchFilter = query
-      ? {
-          userId,
-          name: { $regex: query, $options: "i" },
-        }
-      : { userId };
+      ? { name: { $regex: query, $options: "i" } }
+      : {}; // No filtering if no query
 
     const results = await Item.find(searchFilter);
 
